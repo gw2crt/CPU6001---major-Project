@@ -1,10 +1,15 @@
 import obd
 
-connection = obd.OBD() # auto-connects to USB or RF port
+connection = obd.Async() # auto-connects to USB or RF port
 
-cmd = obd.commands.RPM # select an OBD command (sensor)
+#obd.logger.setLevel(obd.logging.DEBUG) Debug Tool
 
-response = connection.query(cmd) # send the command, and parse the response
+connection.watch(obd.commands.RPM)
+connection.watch(obd.commands.THROTTLE_POS)
+connection.watch(obd.commands.SPEED)
 
-print(response.value) # returns unit-bearing values thanks to Pint
-print(response.value.to("rpm")) # user-friendly unit conversions
+connection.start()
+
+print connection.query(obd.commands.RPM)
+print connection.query(obd.commands.THROTTLE_POS)
+print connection.query(obd.commands.SPEED)
