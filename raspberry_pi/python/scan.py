@@ -1,15 +1,16 @@
 import obd
+import time
 
-connection = obd.Async() # auto-connects to USB or RF port
+connection = obd.Async()
 
-#obd.logger.setLevel(obd.logging.DEBUG) Debug Tool
+# a callback that prints every new value to the console
+def new_rpm(r):
+    print r.value
 
-connection.watch(obd.commands.RPM)
-connection.watch(obd.commands.THROTTLE_POS)
-connection.watch(obd.commands.SPEED)
-
+connection.watch(obd.commands.RPM, callback=new_rpm)
 connection.start()
 
-print connection.query(obd.commands.RPM)
-print connection.query(obd.commands.THROTTLE_POS)
-print connection.query(obd.commands.SPEED)
+# the callback will now be fired upon receipt of new values
+
+time.sleep(60)
+connection.stop()
