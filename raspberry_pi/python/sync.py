@@ -13,7 +13,10 @@ def new_tps(t):
 def new_speed(s):
     print s.value
 
-connection.watch(obd.commands.RPM, callback=new_rpm, obd.commands.THROTTLE_POS, callback=new_tps, obd.commands.SPEED, callback=new_speed)
+connection.watch(obd.commands.RPM, callback=new_rpm)
+connection.watch(obd.commands.THROTTLE_POS, callback=new_tps)
+connection.watch(obd.commands.SPEED, callback=new_speed)
+
 connection.start()
 
 # the callback will now be fired upon receipt of new values
