@@ -16,14 +16,14 @@ def new_tps(t):
 def new_maf(m):
 	print m.value
 
-def new_ful(f):
+def new_lod(l):
 	print f.value
 
 connection.watch(obd.commands.SPEED, callback=new_spd)
 connection.watch(obd.commands.RPM, callback=new_rpm)
 connection.watch(obd.commands.THROTTLE_POS, callback=new_tps)
 connection.watch(obd.commands.MAF, callback=new_maf)
-connection.watch(obd.commands.ENGINE_LOAD, callback=new_ful)
+connection.watch(obd.commands.ENGINE_LOAD, callback=new_lod)
 connection.start()
 
 # the callback will now be fired upon receipt of new values
