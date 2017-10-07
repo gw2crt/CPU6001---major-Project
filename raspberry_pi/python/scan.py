@@ -31,10 +31,7 @@ connection.watch(obd.commands.MAF, callback=new_maf)
 connection.watch(obd.commands.ENGINE_LOAD, callback=new_elod)
 connection.start()
 
-# Note: if s.value != 0: GPIO.output(1, LOW) <- If the vehicle isnt moving the GPIO is set to HIGH.
-
-
-
+# Note: if s.value != 0: GPIO.output(1, LOW) <- If the vehicle isnt moving the GPIO is set to HIGH. this needs testing
 
 # the callback will now be fired upon receipt of new values
 
