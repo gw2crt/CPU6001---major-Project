@@ -1,10 +1,10 @@
+import RPI.GPIO as GPIO
 import obd
 import time
-import RPI.GPIO as GPIO
 
 GPIO.setmode(GPIO.BOARD)
 
-GPIO.setup(1, GPIO.OUT, initial=GPIO.HIGH) #Setup to initial value as HIGH as the vehicle will be stationary at setup.
+GPIO.setup(40, GPIO.OUT, initial=GPIO.HIGH) #Setup to initial value as HIGH as the vehicle will be stationary at setup.
 
 connection = obd.Async()
 
