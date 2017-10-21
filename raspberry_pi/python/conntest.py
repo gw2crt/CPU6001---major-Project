@@ -1,3 +1,18 @@
+import obd
+from obd import OBDStatus
+
+# successful communication with the ELM327 and the vehicle
+OBDStatus.CAR_CONNECTED # "Car Connected"
+
+connection = obd.OBD() # auto-connects to USB or RF port
+
+cmd = obd.commands.RPM # select an OBD command (sensor)
+
+response = connection.query(cmd) # send the command, and parse the response
+
+print(response.value) # returns unit-bearing values thanks to Pint
+
+
 from pymongo import MongoClient
 # pprint library is used to make the output look more pretty
 from pprint import pprint
@@ -7,30 +22,14 @@ client = MongoClient('mongodb://gareth:1utmHy2HBYCKZWLO@testing-shard-00-00-ic2u
 db=client.testdb
 
 from datetime import datetime
+
 result = db.restaurants.insert_one(
     {
-        "address": {
-            "street": "2 Avenue",
-            "zipcode": "10075",
-            "building": "1480",
-            "coord": [-73.9557413, 40.7720266]
-        },
-        "borough": "Manhattan",
-        "cuisine": "Italian",
-        "grades": [
-            {
-                "date": datetime.datetime.utcnow(),
-                "grade": "A",
-                "score": 11
-            },
-            {
-                "date": datetime.strptime("2014-01-16", "%Y-%m-%d"),
-                "grade": "B",
-                "score": 17
-            }
-        ],
-        "name": "Vella",
-        "restaurant_id": "41704620"
+        "Vehicle": {
+            "Model": "Smart",
+            "Year": "2005",
+            "Type": "Roadster",
+            "RPM": response.value.magnitude
+        }
     }
 )
-
