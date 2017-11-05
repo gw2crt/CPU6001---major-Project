@@ -1,5 +1,10 @@
+import RPi.GPIO as GPIO
 import obd
 from obd import OBDStatus
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
+GPIO.setup(18,GPIO.OUT)
 
 while (OBDStatus.CAR_CONNECTED):
     # successful communication with the ELM327 and the vehicle
@@ -19,10 +24,17 @@ while (OBDStatus.CAR_CONNECTED):
     engine_load = connection.query(engload)
 
     print(speed.value)
-    print(revolution.value) # returns unit-bearing values thanks to Pint
+    print(revolution.value.magnitude) # returns unit-bearing values thanks to Pint
     print(throttle_pos.value)
     print(massflow.value)
     print (engine_load.value)
+
+    if revolution.value.magnitude >= 1000:
+        GPIO.output(18,GPIO.HIGH)
+    elif revolution.value.magnitude < 1000:
+        GPIO.output(18,GPIO.LOW)
+    else:
+        GPIO.output(18,GPIO.LOW)
 
     from pymongo import MongoClient
     # pprint library is used to make the output look more pretty
