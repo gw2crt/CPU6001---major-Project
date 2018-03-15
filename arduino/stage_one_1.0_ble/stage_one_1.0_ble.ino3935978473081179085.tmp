@@ -3,7 +3,7 @@
 #include <CurieTime.h>
 
 BLEPeripheral blePeripheral;  // BLE Peripheral Device (the board you're programming)
-BLEService vehicleData("19b10000-e8f2-537e4f6c-d104768a1214"); // BLE Vehicle Service
+BLEService ledService("19b10000-e8f2-537e4f6c-d104768a1214"); // BLE LED Service
 
 // BLE LED Switch Characteristic - custom 128-bit UUID, read and writable by central
 BLEUnsignedCharCharacteristic switchCharacteristic("19b10001-e8f2-537e4f6c-d104768a1216",  // standard 16-bit characteristic UUID
@@ -18,17 +18,19 @@ int accCount = 0; //Counter to store number of times Acc has exceeded limit
 int brakeCount = 0; //Counter to store number of times Braking has exceeded the limit
 int totalTimeacc = 0;
 int totalTimebrake = 0;
+ 
+
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
     while(!Serial);
 
-    blePeripheral.setLocalName("Vehicle_Data");
-    blePeripheral.setAdvertisedServiceUuid(vehicleData.uuid());
+    blePeripheral.setLocalName("BUS");
+    blePeripheral.setAdvertisedServiceUuid(ledService.uuid());
 
     // add service and characteristic:
-    blePeripheral.addAttribute(vehicleData);
+    blePeripheral.addAttribute(ledService);
     blePeripheral.addAttribute(switchCharacteristic);
     blePeripheral.addAttribute(CharacteristicX);
   
@@ -38,6 +40,7 @@ void setup() {
     // begin advertising BLE service:
    blePeripheral.begin();
     
+    setTime(00,00,00,12,8,2017); //Set sketch time Used for Timestamps
     
     CurieIMU.begin(); //Begin the IMU Libary
     CurieIMU.setAccelerometerRange(32); //Sets the range of the accerelormeter
@@ -49,24 +52,29 @@ void setup() {
       CurieIMU.autoCalibrateAccelerometerOffset(Y_AXIS, 0);
       CurieIMU.autoCalibrateAccelerometerOffset(Z_AXIS, 1); 
       }
-    
+    Serial.print("Today is: ");
+    Serial.print(day());
+    Serial.print("/");
+    Serial.print(month());
+    Serial.print("/");
+    Serial.print(year()); 
+    Serial.println();
 }  
 void loop() {
   // put your main code here, to run repeatedly:
   BLECentral central = blePeripheral.central();
   
   if (central) {
-    Serial.print("Connected to central: ");
-    // print the central's MAC address:
-    Serial.println(central.address());
+    Serial.print("BLE connected");
+    Serial.print("central.address");
 
       while (central.connected()) {    
-              int prevCount = accCount;    
+    
               CurieIMU.readAccelerometerScaled(ax, ay, az);
               
               if (ax >=0.30) {
                 start=millis();
-              
+                timeStamp();
                 Serial.print("Acc Over Limit: ");
                 Serial.print(ax);    
                   while(ax >= 0.30){    
@@ -95,7 +103,7 @@ void loop() {
             
               if (ax <= -0.30) {
                 start=millis();
-                
+                timeStamp();
                 Serial.print("Braking Over Limit: ");
                 Serial.print(ax);    
                   while(ax <= -0.30){    
@@ -121,27 +129,41 @@ void loop() {
                Serial.println(" -- -- -- ");
                Serial.println();   
               }
-               Serial.print("Prev");
-               Serial.println(prevCount);
-               Serial.print("acc");
-                Serial.println(accCount);
-                           
-              if (prevCount < accCount) {
-                Serial.println("if Func");
-                   updateSensor();
-              }
-              
+              updateSensor();
+              //updateSensor2();
                
     } //end of BLE While loop 
  } //end of BLE connect
 }
    
+void acc() {         
+}
+void print2digits(int number) {
+  if (number >= 0 && number < 10) {
+    Serial.print('0');
+  }
+  Serial.print(number);
+}
+void timeStamp() {
+    Serial.print("TimeStamp: ");
+    Serial.print(day());
+    Serial.print(" ");
+    Serial.print(month());
+    Serial.print(" ");
+    Serial.print(year());
+    Serial.print("  ");  
+    print2digits(hour());
+    Serial.print(":");
+    print2digits(minute());
+    Serial.print(":");
+    print2digits(second());
+    Serial.println();  
+}
 void updateSensor(){
-  int sensorLevel = accCount;
-  Serial.println(accCount);
+   
+  int sensorLevel = 5;
   switchCharacteristic.setValue(sensorLevel);
   }
-  
 void updateSensor2(){  
   float x = CurieIMU.readAccelerometerScaled(ax) * 1000 ;
   CharacteristicX.setValue(x);
